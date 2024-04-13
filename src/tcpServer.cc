@@ -10,7 +10,7 @@
 #include "socketContext.h"
 #include "socketServer.h"
 #include "tcpServer.h"
-
+#include "src/protobuf/rpc.pb.h"
 namespace Oimo {
 namespace Net {
     TcpServer::TcpServer()
@@ -98,7 +98,7 @@ namespace Net {
         auto ctx = GSocketServer::instance().getSocketContext(fd);
         assert(!ctx->isValid());
         ctx->reset(fd, m_serv->id());
-        auto sock = ctx->sock();
+        auto& sock = ctx->sock();
         sock.setNonBlocking(true);
         sock.setNoDelay(true);
         ctx->setSockType(SocketType::PACCEPT);
@@ -160,6 +160,14 @@ namespace Net {
         }
         auto conn = it->second;
         conn->setCloseFlag();
+    }
+
+    Connection::sPtr TcpServer::findConn(int fd) {
+        auto it = m_conns.find(fd);
+        if (it == m_conns.end()) {
+            return nullptr;
+        }
+        return it->second;
     }
 } // Net
 }  // Oimo

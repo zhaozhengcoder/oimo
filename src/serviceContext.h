@@ -47,6 +47,7 @@ namespace Oimo {
         Packle::sPtr returnPackle() const { return m_returnPackle; }
         void setResponsePackle(Packle::sPtr packle) { m_responsePackle = packle; }
         Packle::sPtr responsePackle() const { return m_responsePackle; }
+        void setReturnPackleAndSetSource(Packle::sPtr packle, int source);
         static void call(ServiceID dest, Packle::sPtr packle);
         static void call(std::string dest, Packle::sPtr packle);
         static void call(ServiceContext::sPtr dest, Packle::sPtr packle);

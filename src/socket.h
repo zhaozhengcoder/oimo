@@ -10,6 +10,7 @@ namespace Net{
         ~Socket();
 
         bool create(int domain, int type, int protocol);
+        bool connect(Address* peerAddr);
         void setFd(int fd) { m_fd = fd; }
         bool bind(const Address& addr);
         bool listen();

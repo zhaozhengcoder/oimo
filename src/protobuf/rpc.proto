@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package NetProto;
+
+message Header {
+    int32  len  = 1;
+    int32  msg_id = 2;
+    string src_name  = 3;
+    string dest_name = 4;
+    RpcCallback callback = 5;
+}
+
+message RpcCallback {
+    uint32 packle_session_id = 1;
+    uint32 packle_source     = 2;
+}
+
+message RpcRequest {
+    Header head = 1;
+    Body   Body = 2;
+}
+
+message RpcResponse {
+    Header head = 1;
+    Body   Body = 2;
+}
+
+message Rpc {
+    RpcRequest  request  = 1;
+    RpcResponse response = 2;
+}
+
+message Ping {
+    string req_ping = 1;
+}
+
+message Pong {
+    string rsp_pong = 1;
+}
+
+message Body {
+    Ping ping_biz_data = 1;
+    Pong pong_biz_data = 2;
+}

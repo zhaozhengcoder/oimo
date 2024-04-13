@@ -21,6 +21,29 @@ namespace Net {
         return m_fd != -1;
     }
 
+    bool Socket::connect(Address* peerAddr) {
+        if (m_fd != -1) {
+            LOG_ERROR << "Socket already created";
+            close();
+            return false;
+        }
+
+        if (!create(AF_INET, SOCK_STREAM, 0)) {
+            LOG_ERROR << "Failed to create socket";
+            return false;
+        }
+
+        sockaddr_in addr = peerAddr->sockAddr();
+        if (::connect(m_fd, (struct sockaddr *)&addr
+                , sizeof(peerAddr->sockAddr())) < 0) {
+            LOG_ERROR << "ERROR connecting";
+            close();
+            return false;
+        }
+        LOG_INFO << "connect done";
+        return true;
+    }
+
     bool Socket::bind(const Address& address) {
         assert(m_fd != -1);
         auto addr = address.sockAddr();

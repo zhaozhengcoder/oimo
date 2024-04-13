@@ -5,3 +5,5 @@ lib/
 include/
 tests/protobuf/*.pb.cc
 tests/protobuf/*.pb.h
+src/protobuf/*.pb.h
+src/protobuf/*.pb.cc

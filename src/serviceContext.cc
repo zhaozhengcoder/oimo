@@ -149,6 +149,13 @@ namespace Oimo {
             return coroutine;
         }
     }
+
+    void ServiceContext::setReturnPackleAndSetSource(Packle::sPtr packle, int source) {
+        auto cor = Coroutine::currentCoroutine();
+        cor->setReservSrc(source);
+        m_returnPackle = packle;
+    }
+
     void ServiceContext::returnCoroutine(Coroutine::sPtr coroutine) {
         assert(coroutine);
         t_freeQueue.push(coroutine);

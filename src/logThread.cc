@@ -58,7 +58,7 @@ namespace Oimo {
             m_buffers.clear();
             {
                 std::unique_lock<std::mutex> lock(g_logMutex);
-                g_logCond.wait_for(lock, std::chrono::seconds(3));
+                g_logCond.wait_for(lock, std::chrono::seconds(1));
                 m_buffers.swap(g_logBuffers);
             }
             if (m_appendToFile) {

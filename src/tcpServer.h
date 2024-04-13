@@ -19,6 +19,10 @@ namespace Net {
         void start(ConnCb cb);
         void addConn(int fd, Connection::sPtr conn);
         void removeConn(int fd);
+        Oimo::Service* service() {return m_serv;}
+        bool hasFd(int fd) {return m_conns.find(fd) != m_conns.end();}
+        Connection::sPtr findConn(int fd);
+        auto getConns() {return &m_conns;}
     private:
         void handleNewConn(Oimo::Packle::sPtr packle);
         void handleRead(Oimo::Packle::sPtr packle);

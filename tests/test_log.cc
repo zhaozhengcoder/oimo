@@ -27,6 +27,9 @@ int main() {
     app.init();
     Singleton<LogThread>::instance().start();
     Logger::setLogLevel(LogLevel::DEBUG);
+
+    assert(0);
+
     test();
     std::vector<Thread::sPtr> threads;
     for (int i = 0; i < 2; ++i) {

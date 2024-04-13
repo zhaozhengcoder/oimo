@@ -12,4 +12,8 @@ namespace Oimo {
         CLOSED = 0XFF05,
         ERROR = 0XFF06
     };
+
+    enum class CommonMsgType {
+        RpcCall = 1025
+    };
 }

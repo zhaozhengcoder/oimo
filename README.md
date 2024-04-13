@@ -143,6 +143,72 @@ int main() {
 }
 ```
 
+## 新增特性 
+1. 跨进程call service调用
+
+    在原来的代码中call service只可以作用在本进程中调用，主要的目的是来解决cpp代码开发中的异步问题，通过call机制可以用同步的方式来写出高性能的异步代码。
+
+    但这里有个问题，对于一个服务器的框架，往往有多个进程，比如master进程，场景进程，各类服务进程。对于一个游戏服务器来说，更需要的是多进程之间的异步调用。
+
+    * 对于服务的调用方
+        对于调用的service name，会自动完成底层的网络序列化等操作，发送到对应的进程上。
+        ```
+        RpcCall(rpc_connection, msg_id, service_name, pb_biz_data)
+        ```
+
+    * 服务被调用方只需要接入`app.newService<RpcClientStub>("rpcStub");`就可以支持跨进程的service调用。
+        ```
+        class PongService : public Service {
+            public:
+                // 注册rpc call的回调
+                void init(Packle::sPtr packle) {
+                    registerFunc((Packle::MsgID)CommonMsgType::RpcCall,
+                        std::bind(&PongService::pong, this, std::placeholders::_1));
+                }
+
+            private:
+                // 处理逻辑：
+                void pong(Packle::sPtr packle) {
+                    auto rpc_message = std::any_cast<NetProto::Rpc>(packle->userData);
+                    LOG_DEBUG << rpc_message.ShortDebugString();
+
+                    NetProto::Rpc rpc;
+                    auto rsp = rpc.mutable_response();
+                    rsp->mutable_head()->CopyFrom(rpc_message.request().head());
+                    rsp->mutable_body()->mutable_pong_biz_data()->set_rsp_pong("helloworld");
+                    packle->userData = rpc;
+                    setReturnPackle(packle);
+                }
+        };
+
+        int main() {
+            // ...
+
+            app.newService<RpcClientStub>("rpcStub");
+            app.newService<PongService>("pong");
+        
+            // ...
+        }
+        ```
+
+
+代码：
+
+* [master进程](./tests/test_master.cc)
+
+* [slave进程](./tests/test_slave.cc)
+
+
+## 路由机制
+
+在多个进程之间相互rpc调用的时候，需要各个进程在init阶段完成网络的连接。当进程的数量较多的时候，会形成一个非常复杂的网络。这个时候有一个路由进程，可以比较好的解决网络发散的问题。所有的进程都和路由进程连接，注册自己的服务。发起call service的时候，先检查本地时都有这个服务。没有的话，发给路由进程。路由进程根据自己注册的路由表进行转发。
+
+
+
+
+// todo
+
+
 ## 参考
 1. https://github.com/cloudwu/skynet
 2. https://github.com/chenshuo/muduo
